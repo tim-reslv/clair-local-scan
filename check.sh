@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER="${1}"
+CONTAINER="${1:-clair}"
 
 while true
 do

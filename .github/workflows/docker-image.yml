@@ -30,3 +30,10 @@ jobs:
 
       - name: Build the image
         run: docker build -t $CLAIR_LOCAL_SCAN_IMAGE --build-arg VERSION=$CLAIR_VERSION clair
+        
+      - name: before_scriptr
+        run: |
+          docker pull $POSTGRES_IMAGE
+          docker run -d --name postgres -e 'PGDATA=/var/lib/postgresql/clair' -e POSTGRES_PASSWORD=password $POSTGRES_IMAGE
+          until docker run --rm -it --link postgres:postgres -e PGPASSWORD=password $POSTGRES_IMAGE pg_isready -U postgres -h postgres; do sleep 1; done
+          docker run -d --name clair --link postgres:postgres $CLAIR_LOCAL_SCAN_IMAGE

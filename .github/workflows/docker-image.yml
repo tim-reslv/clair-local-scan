@@ -36,7 +36,12 @@ jobs:
           docker pull $POSTGRES_IMAGE
           docker run -d --name postgres -e 'PGDATA=/var/lib/postgresql/clair' -e POSTGRES_PASSWORD=password $POSTGRES_IMAGE
 
-      - name: Run Postgres
+      - name: Run Clair
         run: |
           docker run --rm -d --link postgres:postgres -e PGPASSWORD=password $POSTGRES_IMAGE pg_isready -U postgres -h postgres
           docker run -d --name clair --link postgres:postgres $CLAIR_LOCAL_SCAN_IMAGE
+
+      - name: Check
+        run: |
+          ./check.sh
+          docker logs clair

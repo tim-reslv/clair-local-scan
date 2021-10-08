@@ -16,12 +16,10 @@ jobs:
       CLAIR_VERSION: "v2.1.7"
       CLAIR_LOCAL_SCAN_IMAGE: "tim707/clair-local-scan"
 
-    # steps to perform in job
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # setup Docker buld action
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
@@ -29,10 +27,10 @@ jobs:
           driver: docker
           install: true
 
-      - name: Build the image
+      - name: Build image
         run: docker build -t $CLAIR_LOCAL_SCAN_IMAGE --build-arg VERSION=$CLAIR_VERSION clair
         
-      - name: Run Postgres
+      - name: Start Postgres
         run: |
           docker pull $POSTGRES_IMAGE
           docker run -d --name postgres -e 'PGDATA=/var/lib/postgresql/clair' -e POSTGRES_PASSWORD=password $POSTGRES_IMAGE
@@ -40,11 +38,11 @@ jobs:
         run: |
           docker run --rm -d --link postgres:postgres -e PGPASSWORD=password $POSTGRES_IMAGE pg_isready -U postgres -h postgres
           docker run -d --name clair --link postgres:postgres $CLAIR_LOCAL_SCAN_IMAGE
-#      - name: Check
-#        run: |
-#          ./check.sh
-#          docker logs clair
-      - name: Tag clair-db image
+      - name: Checking
+        run: |
+          ./check.sh
+          docker logs clair
+      - name: Tag images
         run: |
           docker stop clair
           docker stop postgres

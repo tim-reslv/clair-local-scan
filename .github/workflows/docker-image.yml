@@ -43,5 +43,5 @@ jobs:
 
       - name: Check
         run: |
-          ./check.sh
+          ./check.sh clair
           docker logs clair

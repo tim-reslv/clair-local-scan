@@ -45,3 +45,12 @@ jobs:
         run: |
           ./check.sh
           docker logs clair
+
+      - name: Tag clair-db image
+        run: |
+          docker stop clair
+          docker stop postgres
+          docker commit postgres arminc/clair-db:$(date +%Y-%m-%d)
+          docker tag arminc/clair-db:$(date +%Y-%m-%d) arminc/clair-db:latest
+          docker tag $CLAIR_LOCAL_SCAN_IMAGE ${CLAIR_LOCAL_SCAN_IMAGE}:${CLAIR_VERSION}_${GITHUB_SHA}
+          docker images
